@@ -19,21 +19,29 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
 
 <header class="navbar">
-    <div class="logo">🌙 LunaSteps</div>
+    <div class="logo">
+        <a href="/WEB_BASED/" class="logo-link">
+            🌙 LunaSteps
+        </a>
+    </div>
 
     <nav>
-        <a href="/WEB_BASED/index.php">Home</a>
+        <a href="/WEB_BASED/">Home</a>
 
         <?php if(isset($_SESSION['role'])): ?>
+
             <?php if($_SESSION['role'] == "customer"): ?>
-                <a href="/WEB_BASED/customer/index.php">Dashboard</a>
+                <a href="/WEB_BASED/profile.php">Profile</a>
+
             <?php elseif($_SESSION['role'] == "admin"): ?>
                 <a href="/WEB_BASED/admin/index.php">Admin</a>
+                <a href="/WEB_BASED/auth/logout.php" class="btn logout-btn">Logout</a>
+
             <?php elseif($_SESSION['role'] == "staff"): ?>
                 <a href="/WEB_BASED/staff/index.php">Staff</a>
-            <?php endif; ?>
+                <a href="/WEB_BASED/auth/logout.php" class="btn logout-btn">Logout</a>
 
-            <a href="/WEB_BASED/auth/logout.php" class="btn">Logout</a>
+            <?php endif; ?>
 
         <?php else: ?>
             <a href="/WEB_BASED/auth/login.php" class="btn">Login</a>

@@ -11,7 +11,11 @@ include "../partials/header.php";
 
 <section class="dashboard fade-in">
     <h1>🌙 Customer Dashboard</h1>
-    <p>Welcome to LunaSteps, valued customer.</p>
+    <?php if(isset($_SESSION['full_name'])): ?>
+        <h3 class="welcome-text">
+            Welcome, <?= htmlspecialchars($_SESSION['full_name']) ?> 🌙
+        </h3>
+    <?php endif; ?>
 
     <div class="card-box">
         <div class="card hover-zoom">
