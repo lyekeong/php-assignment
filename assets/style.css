@@ -370,3 +370,38 @@ body {
 .logout-btn-large:hover {
     background:#f87171;
 }
+
+/* ===== PROFILE ERROR STYLE ===== */
+
+.input-error {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #ff6b6b;
+    animation: fadeIn 0.25s ease;
+}
+
+/* 红色边框 */
+.form-group input.error-border {
+    border: 1px solid #ff6b6b;
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
+}
+
+/* 成功提示 */
+.success-box {
+    background: rgba(0, 255, 128, 0.12);
+    border: 1px solid rgba(0, 255, 128, 0.4);
+    color: #34d399;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.btn-secondary {
+    background:#334155;
+}
+
+.btn-secondary:hover {
+    background:#475569;
+}

@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/WEB_BASED/assets/style.css">
+    <link rel="stylesheet" href="/WEB_BASED/assets/style.css?v=<?= time() ?>">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -31,7 +31,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <?php if(isset($_SESSION['role'])): ?>
 
             <?php if($_SESSION['role'] == "customer"): ?>
-                <a href="/WEB_BASED/profile.php">Profile</a>
+                <a href="/WEB_BASED/customer/profile.php">Profile</a>
 
             <?php elseif($_SESSION['role'] == "admin"): ?>
                 <a href="/WEB_BASED/admin/index.php">Admin</a>

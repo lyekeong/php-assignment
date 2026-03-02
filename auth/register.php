@@ -16,11 +16,11 @@ unset($_SESSION['old']);
 
             <!-- Full Name -->
             <div class="form-group">
-                <input type="text" name="full_name"
-                    value="<?= htmlspecialchars($old['full_name'] ?? '') ?>"
-                    placeholder="Full Name" required>
-                <?php if(isset($errors['full_name'])): ?>
-                    <small class="error-text"><?= $errors['full_name'] ?></small>
+                <input type="text" name="username"
+                    value="<?= htmlspecialchars($old['username'] ?? '') ?>"
+                    placeholder="Username" required>
+                <?php if(isset($errors['username'])): ?>
+                    <small class="error-text"><?= $errors['username'] ?></small>
                 <?php endif; ?>
             </div>
 

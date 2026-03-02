@@ -1,10 +1,13 @@
 <?php
 require "../config/db.php";
 
-$login = trim($_POST['email'] ?? ""); // input name 保持 email
+$login = trim($_POST['login'] ?? "");
 $password = $_POST['password'] ?? "";
 
+$_SESSION['old_login'] = $login; // keep last input
+
 if ($login === "" || $password === "") {
+    $_SESSION['login_error'] = "Please enter login and password.";
     header("Location: login.php");
     exit();
 }
@@ -19,22 +22,30 @@ $sql = "SELECT u.user_id, u.username, u.password_hash, r.role_name
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $login, $login);
 $stmt->execute();
+
 $result = $stmt->get_result();
+$row = $result->fetch_assoc();
 
-if ($row = $result->fetch_assoc()) {
-
-    if (password_verify($password, $row['password_hash'])) {
-
-        session_regenerate_id(true);
-
-        $_SESSION['user_id'] = $row['user_id'];
-        $_SESSION['role'] = $row['role_name'];
-        $_SESSION['username'] = $row['username'];
-
-        header("Location: ../index.php");
-        exit();
-    }
+if (!$row) {
+    $_SESSION['login_error'] = "Account not found.";
+    header("Location: login.php");
+    exit();
 }
 
-header("Location: login.php");
+if (!password_verify($password, $row['password_hash'])) {
+    $_SESSION['login_error'] = "Wrong password.";
+    header("Location: login.php");
+    exit();
+}
+
+// success
+session_regenerate_id(true);
+
+$_SESSION['user_id'] = $row['user_id'];
+$_SESSION['role'] = $row['role_name'];
+$_SESSION['username'] = $row['username'];
+
+unset($_SESSION['old_login']);
+
+header("Location: ../index.php");  // everyone goes homepage
 exit();

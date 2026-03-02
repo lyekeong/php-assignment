@@ -4,17 +4,31 @@ require "../config/db.php";
 $errors = [];
 $old = $_POST;
 
-$name = trim($_POST['full_name']);
+$username = trim($_POST['username']);
 $email = trim($_POST['email']);
 $phone = trim($_POST['phone']);
 $password = $_POST['password'];
 $confirm = $_POST['confirm_password'];
 
 /* ===== NAME ===== */
-if (strlen($name) < 3 || strlen($name) > 50 ||
-    !preg_match("/^[A-Za-z .'-]+$/", $name)) {
-    $errors['full_name'] = "Name must be 3–50 letters only.";
+if ($username === "") {
+    $errors['username'] = "Username is required.";
 }
+elseif (strlen($username) < 3 || strlen($username) > 20 ||
+    !preg_match("/^[A-Za-z0-9_]+$/", $username)) {
+    $errors['username'] = "Username must be 3–20 letters, numbers or underscore only.";
+}
+
+/* ===== CHECK DUPLICATE USERNAME ===== */
+$stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$stmt->store_result();
+
+if ($stmt->num_rows > 0) {
+    $errors['username'] = "Username already taken.";
+}
+
 
 /* ===== EMAIL ===== */
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
