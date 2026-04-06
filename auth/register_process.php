@@ -59,7 +59,6 @@ if (strlen($password) < 8) $missing[] = "at least 8 characters";
 if (!preg_match("/[A-Z]/", $password)) $missing[] = "one uppercase letter";
 if (!preg_match("/[a-z]/", $password)) $missing[] = "one lowercase letter";
 if (!preg_match("/[0-9]/", $password)) $missing[] = "one number";
-if (!preg_match("/[\W]/", $password)) $missing[] = "one symbol";
 
 if (!empty($missing)) {
     $errors['password'] = "Password must include: " . implode(", ", $missing) . ".";

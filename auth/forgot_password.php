@@ -3,7 +3,8 @@ session_start();
 include "../partials/header.php";
 
 $error = $_SESSION['forgot_error'] ?? "";
-unset($_SESSION['forgot_error']);
+$success = $_SESSION['forgot_success'] ?? "";
+unset($_SESSION['forgot_error'], $_SESSION['forgot_success']);
 ?>
 
 <div class="auth-container">
@@ -11,7 +12,11 @@ unset($_SESSION['forgot_error']);
     <h2>Forgot Password</h2>
 
     <?php if($error): ?>
-      <div class="error-box"><?= $error ?></div>
+      <div class="error-box"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <?php if($success): ?>
+      <div class="success-box"><?= htmlspecialchars($success) ?></div>
     <?php endif; ?>
 
     <form action="reset_password.php" method="POST">
@@ -19,7 +24,7 @@ unset($_SESSION['forgot_error']);
         <input type="email" name="email" placeholder="Enter your registered email" required>
       </div>
 
-      <button class="btn">Continue</button>
+      <button type="submit" class="btn">Continue</button>
     </form>
 
   </div>

@@ -7,27 +7,48 @@ body {
 
 /* NAVBAR */
 .navbar {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 60px;
-    background:#111827;
-    position:sticky;
-    top:0;
-    z-index:1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
 }
 
-.navbar nav a {
-    margin-left:20px;
-    text-decoration:none;
-    color:white;
-    transition:0.3s;
+.nav-left,
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
 }
 
-.navbar nav a:hover {
-    color:#6366f1;
+.nav-icons-left,
+.nav-icons-right,
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
+.icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.icon-link:hover {
+    background: #f3f3f3;
+    color: #000;
+}
+
+.logo-link {
+    text-decoration: none;
+}
 .logo {
     font-weight:700;
     font-size:22px;

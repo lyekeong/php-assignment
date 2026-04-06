@@ -10,41 +10,60 @@ if (session_status() === PHP_SESSION_NONE) {
     <title>LunaSteps</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="/WEB_BASED/assets/style.css?v=<?= time() ?>">
-
+    <link rel="stylesheet" href="/assets/style.css?v=<?= time() ?>">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
 
 <header class="navbar">
-    <div class="logo">
-        <a href="/WEB_BASED/" class="logo-link">
-            🌙 LunaSteps
-        </a>
+    <div class="nav-left">
+        <div class="logo">
+            <a href="/" class="logo-link" aria-label="Homepage">
+                🌙 LunaSteps
+            </a>
+        </div>
+
+        <nav class="nav-icons-left">
+            <a href="/index.php" class="icon-link" aria-label="Home">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="/customer/cart.php" class="icon-link" aria-label="Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+        </nav>
     </div>
 
-    <nav>
-        <a href="/WEB_BASED/">Home</a>
+    <div class="nav-right">
+        <nav class="nav-icons-right">
+            <a href="/customer/shop.php" class="icon-link" aria-label="Shop">
+                <i class="fa-solid fa-store"></i>
+            </a>
+        </nav>
 
-        <?php if(isset($_SESSION['role'])): ?>
+        <nav class="nav-auth">
+            <?php if (isset($_SESSION['role'])): ?>
 
-            <?php if($_SESSION['role'] == "customer"): ?>
-                <a href="/WEB_BASED/customer/profile.php">Profile</a>
+                <?php if ($_SESSION['role'] == "customer"): ?>
+                    <a href="/customer/profile.php">Profile</a>
+                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
 
-            <?php elseif($_SESSION['role'] == "admin"): ?>
-                <a href="/WEB_BASED/admin/index.php">Admin</a>
-                <a href="/WEB_BASED/auth/logout.php" class="btn logout-btn">Logout</a>
+                <?php elseif ($_SESSION['role'] == "admin"): ?>
+                    <a href="/admin/index.php">Admin</a>
+                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
 
-            <?php elseif($_SESSION['role'] == "staff"): ?>
-                <a href="/WEB_BASED/staff/index.php">Staff</a>
-                <a href="/WEB_BASED/auth/logout.php" class="btn logout-btn">Logout</a>
+                <?php elseif ($_SESSION['role'] == "staff"): ?>
+                    <a href="/staff/index.php">Staff</a>
+                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
 
+                <?php endif; ?>
+
+            <?php else: ?>
+                <a href="/auth/login.php" class="btn">Login</a>
             <?php endif; ?>
-
-        <?php else: ?>
-            <a href="/WEB_BASED/auth/login.php" class="btn">Login</a>
-        <?php endif; ?>
-    </nav>
+        </nav>
+    </div>
 </header>
