@@ -1,57 +1,77 @@
 <?php
-require "../config/db.php";
+session_start();
+date_default_timezone_set('Asia/Kuala_Lumpur');
+require_once "../config/db.php";
+require_once "../mailer/SMTP.php";
+require_once "../mailer/PHPMailer.php";
 
-$email = trim($_POST['email'] ?? "");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: forgot_password.php");
+    exit;
+}
+
+$email = trim($_POST["email"] ?? "");
 
 if ($email === "") {
-    $_SESSION['forgot_error'] = "Email is required.";
+    $_SESSION['forgot_error'] = "Please enter your email.";
     header("Location: forgot_password.php");
-    exit();
+    exit;
 }
 
-/* ===== EMAIL FORMAT VALIDATION ===== */
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $_SESSION['forgot_error'] = "Invalid email format.";
-    header("Location: forgot_password.php");
-    exit();
-}
-
-/* ===== CHECK EXISTENCE ===== */
-$stmt = $conn->prepare("SELECT user_id FROM users WHERE email=?");
+$stmt = $conn->prepare("SELECT user_id, email FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
+$user = $result->fetch_assoc();
 
-if ($result->num_rows === 0) {
-    $_SESSION['forgot_error'] = "Email not found.";
+if (!$user) {
+    $_SESSION['forgot_error'] = "No account found with that email.";
     header("Location: forgot_password.php");
-    exit();
+    exit;
 }
 
-$user = $result->fetch_assoc();
-$_SESSION['reset_user_id'] = $user['user_id'];
+$token = bin2hex(random_bytes(32));
+$expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-include "../partials/header.php";
-?>
+$updateStmt = $conn->prepare("
+    UPDATE users
+    SET reset_token = ?, reset_token_expiry = ?
+    WHERE user_id = ?
+");
+$updateStmt->bind_param("ssi", $token, $expiry, $user['user_id']);
+$updateStmt->execute();
 
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>Reset Password</h2>
+$link = "http://localhost:8000/auth/reset_form.php?token=" . urlencode($token);
 
-    <form action="reset_password_process.php" method="POST">
+$mail = new PHPMailer();
 
-      <div class="form-group">
-        <input type="password" name="new_password" placeholder="New Password" required>
-      </div>
+$mail->isSMTP();
+$mail->Host = "smtp.gmail.com";
+$mail->SMTPAuth = true;
+$mail->Username = "glebested@gmail.com";
+$mail->Password = "kwko vuvg ucvq lshe";
+$mail->SMTPSecure = "tls";
+$mail->Port = 587;
 
-      <div class="form-group">
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-      </div>
+$mail->setFrom("glebested@gmail.com", "LunaSteps");
+$mail->addAddress($email);
 
-      <button class="btn">Reset Password</button>
-    </form>
+$mail->isHTML(true);
+$mail->Subject = "LunaSteps Password Reset";
+$mail->Body = "
+    <p>Hello,</p>
+    <p>We received a password reset request.</p>
+    <p>Click the link below to reset your password:</p>
+    <p><a href='{$link}'>{$link}</a></p>
+    <p>This link will expire in 1 hour.</p>
+";
+$mail->AltBody = "Reset your password using this link: {$link}";
 
-  </div>
-</div>
+if ($mail->send()) {
+    $_SESSION['forgot_success'] = "Reset email sent successfully.";
+} else {
+    $_SESSION['forgot_error'] = "Mailer Error: " . $mail->ErrorInfo;
+}
 
-<?php include "../partials/footer.php"; ?>
+header("Location: forgot_password.php");
+exit;

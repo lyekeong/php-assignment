@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+date_default_timezone_set('Asia/Kuala_Lumpur');
+require_once __DIR__ . '/remember_me.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

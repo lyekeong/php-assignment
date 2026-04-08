@@ -85,6 +85,38 @@ $_SESSION['user_id'] = $row['user_id'];
 $_SESSION['role'] = $row['role_name'];
 $_SESSION['username'] = $row['username'];
 
+if (!empty($_POST['remember_me'])) {
+    $selector = bin2hex(random_bytes(8));
+    $validator = bin2hex(random_bytes(32));
+    $hashedValidator = hash('sha256', $validator);
+    $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+    $stmt = $pdo->prepare("
+        INSERT INTO remember_tokens (user_id, selector, hashed_validator, expires_at)
+        VALUES (:user_id, :selector, :hashed_validator, :expires_at)
+    ");
+    $stmt->execute([
+        ':user_id' => $user['id'],
+        ':selector' => $selector,
+        ':hashed_validator' => $hashedValidator,
+        ':expires_at' => $expires
+    ]);
+
+    $cookieValue = $selector . ':' . $validator;
+
+    setcookie(
+        'remember_me',
+        $cookieValue,
+        [
+            'expires' => time() + (60 * 60 * 24 * 30),
+            'path' => '/',
+            'secure' => isset($_SERVER['HTTPS']),
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]
+    );
+}
+
 unset($_SESSION['old_login']);
 
 header("Location: ../index.php");

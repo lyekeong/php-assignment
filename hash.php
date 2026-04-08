@@ -1,3 +1,1 @@
-<?php
-echo password_hash("123456Aa!", PASSWORD_DEFAULT);
-?>
+sxzz nmmo uohq wbou

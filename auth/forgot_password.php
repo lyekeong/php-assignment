@@ -26,7 +26,6 @@ unset($_SESSION['forgot_error'], $_SESSION['forgot_success']);
 
       <button type="submit" class="btn">Continue</button>
     </form>
-
   </div>
 </div>
 

@@ -7,7 +7,19 @@ $old_login = $_SESSION['old_login'] ?? "";
 unset($_SESSION['login_error']);
 unset($_SESSION['old_login']);
 ?>
+<style>
+    .remember-row {
+        margin: 6px 0 10px 0;
+    }
 
+    .remember-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+</style>
 <div class="auth-container">
     <div class="auth-card fade-in">
         <h2>🌙 LunaSteps Login</h2>
@@ -39,6 +51,13 @@ unset($_SESSION['old_login']);
                 >
                 <small class="input-error" id="passwordError"></small>
             </div>
+
+            <div class="form-row remember-row">
+    <label class="remember-label">
+        <input type="checkbox" name="remember_me" value="1">
+        Remember Me
+    </label>
+</div>
 
             <button class="btn pulse" type="submit">Login</button>
         </form>
