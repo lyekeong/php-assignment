@@ -1,5 +1,13 @@
 <?php
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
 require "../../config/db.php";
+require "../../mailer/SMTP.php";
+require "../../mailer/PHPMailer.php";
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $errors = [];
 $old = $_POST;
@@ -29,9 +37,7 @@ if ($username === '') {
     $stmt->execute([
         ':username' => $username
     ]);
-    $existingUser = $stmt->fetch();
-
-    if ($existingUser) {
+    if ($stmt->fetch()) {
         $errors['username'] = "Username already taken.";
     }
 }
@@ -53,9 +59,7 @@ if ($email === '') {
     $stmt->execute([
         ':email' => $email
     ]);
-    $existingEmail = $stmt->fetch();
-
-    if ($existingEmail) {
+    if ($stmt->fetch()) {
         $errors['email'] = "Email already registered.";
     }
 }
@@ -100,10 +104,27 @@ if (!empty($errors)) {
 
 /* ===== INSERT USER ===== */
 $hashed = password_hash($password, PASSWORD_DEFAULT);
+$verifyToken = bin2hex(random_bytes(32));
 
 $stmt = $db->prepare("
-    INSERT INTO users (username, email, phone, password_hash, profile_photo)
-    VALUES (:username, :email, :phone, :password_hash, :profile_photo)
+    INSERT INTO users (
+        username,
+        email,
+        phone,
+        password_hash,
+        profile_photo,
+        email_verify_token,
+        email_verified_at
+    )
+    VALUES (
+        :username,
+        :email,
+        :phone,
+        :password_hash,
+        :profile_photo,
+        :email_verify_token,
+        NULL
+    )
 ");
 
 $stmt->execute([
@@ -111,7 +132,8 @@ $stmt->execute([
     ':email' => $email,
     ':phone' => $phone,
     ':password_hash' => $hashed,
-    ':profile_photo' => '/customer/images/default_profile_picture.jpg'
+    ':profile_photo' => '/customer/images/default_profile_picture.jpg',
+    ':email_verify_token' => $verifyToken
 ]);
 
 $user_id = $db->lastInsertId();
@@ -125,5 +147,44 @@ $stmt2->execute([
     ':user_id' => $user_id
 ]);
 
-header("Location: ../login/login.php");
-exit();
+/* ===== SEND VERIFICATION EMAIL ===== */
+$verifyLink = "http://localhost:8000/auth/register/verify_email.php?token=" . urlencode($verifyToken);
+
+$mail = new PHPMailer();
+
+try {
+    $mail->isSMTP();
+    $mail->Host = "smtp.gmail.com";
+    $mail->SMTPAuth = true;
+    $mail->Username = "glebested@gmail.com";
+    $mail->Password = "kwko vuvg ucvq lshe";
+    $mail->SMTPSecure = "tls";
+    $mail->Port = 587;
+
+    $mail->setFrom("glebested@gmail.com", "LunaSteps");
+    $mail->addAddress($email, $username);
+
+    $mail->isHTML(true);
+    $mail->Subject = "LunaSteps Email Verification";
+    $mail->Body = "
+        <p>Hello {$username},</p>
+        <p>Thank you for registering at LunaSteps.</p>
+        <p>Please click the link below to verify your email:</p>
+        <p><a href='{$verifyLink}'>{$verifyLink}</a></p>
+        <p>If you did not create this account, you may ignore this email.</p>
+    ";
+    $mail->AltBody = "Verify your email using this link: {$verifyLink}";
+
+    $mail->send();
+
+    $_SESSION['register_success'] = "Account created successfully. Please check your email to verify your account.";
+    header("Location: ../login/login.php");
+    exit();
+
+} catch (Exception $e) {
+    $_SESSION['errors'] = [
+        'email' => "Account created, but verification email could not be sent."
+    ];
+    header("Location: register.php");
+    exit();
+}

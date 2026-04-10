@@ -3,21 +3,37 @@ include "../../partials/header.php";
 
 $error = $_SESSION['login_error'] ?? "";
 $old_login = $_SESSION['old_login'] ?? "";
-
+$success = $_SESSION['register_success'] ?? "";
+unset($_SESSION['register_success']);
 unset($_SESSION['login_error']);
 unset($_SESSION['old_login']);
 ?>
 
 <style>
 .remember-row {
-    margin: 6px 0 10px 0;
+    margin: 10px 0 18px 0;
+    display: flex;
+    justify-content: center;
 }
 
 .remember-label {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 14px;
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #e5e7eb;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.remember-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #6366f1;
     cursor: pointer;
 }
 </style>
@@ -26,6 +42,9 @@ unset($_SESSION['old_login']);
     <div class="auth-card fade-in">
         <h2>🌙 LunaSteps Login</h2>
 
+        <?php if ($success): ?>
+            <div class="success-box"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
         <?php if ($error): ?>
             <div class="error-box"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>

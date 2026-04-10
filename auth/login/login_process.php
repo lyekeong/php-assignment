@@ -23,6 +23,7 @@ $sql = "
         u.password_hash,
         u.failed_login_attempts,
         u.locked_until,
+        u.email_verified_at,
         r.role_name
     FROM users u
     JOIN user_roles ur ON u.user_id = ur.user_id
@@ -50,7 +51,12 @@ if (!empty($row['locked_until']) && strtotime($row['locked_until']) > time()) {
     header("Location: login.php");
     exit();
 }
-
+if (empty($row['email_verified_at'])) {
+    $_SESSION['login_error'] = "Please verify your email before login.";
+    $_SESSION['old_login'] = $login;
+    header("Location: login.php");
+    exit();
+}
 /* verify password */
 if (!password_verify($password, $row['password_hash'])) {
     $failed_attempts = (int)$row['failed_login_attempts'] + 1;
