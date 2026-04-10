@@ -4,6 +4,25 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 date_default_timezone_set('Asia/Kuala_Lumpur');
 require_once __DIR__ . '/remember_me.php';
+require_once __DIR__ . '/../config/db.php';
+
+$headerProfilePhoto = '/customer/images/default_profile_picture.jpg';
+
+if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'customer') {
+    $stmt = $db->prepare("
+        SELECT profile_photo
+        FROM users
+        WHERE user_id = :user_id
+    ");
+    $stmt->execute([
+        ':user_id' => $_SESSION['user_id']
+    ]);
+    $headerUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($headerUser['profile_photo'])) {
+        $headerProfilePhoto = $headerUser['profile_photo'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +39,13 @@ require_once __DIR__ . '/remember_me.php';
 </head>
 
 <body>
-
+<?php $isHomePage = basename($_SERVER['PHP_SELF']) === 'index.php'; ?>
+<?php if (!$isHomePage): ?>
+    <div class="global-sky">
+        <div class="global-stars"></div>
+        <div class="global-moon"></div>
+    </div>
+<?php endif; ?>
 <header class="navbar">
     <div class="nav-left">
         <div class="logo">
@@ -51,8 +76,10 @@ require_once __DIR__ . '/remember_me.php';
             <?php if (isset($_SESSION['role'])): ?>
 
                 <?php if ($_SESSION['role'] == "customer"): ?>
-                    <a href="/customer/order.php">Orders</a>
-                    <a href="/customer/profile/profile.php">Profile</a>
+                    <a href="/customer/order.php" class="nav-pill">Orders</a>
+                    <a href="/customer/profile/profile.php" class="nav-avatar-link" aria-label="Profile">
+                        <img src="<?= htmlspecialchars($headerProfilePhoto) ?>" alt="Profile" class="nav-avatar">
+                    </a>
                     <a href="/auth/login/logout.php" class="btn logout-btn">Logout</a>
 
                 <?php elseif ($_SESSION['role'] == "admin"): ?>

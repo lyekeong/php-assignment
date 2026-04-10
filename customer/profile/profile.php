@@ -22,6 +22,10 @@ $photo = !empty($user['profile_photo'])
 
 include "../../partials/header.php";
 ?>
+<?php if (!empty($_SESSION['toast'])): ?>
+    <div id="toast"><?= $_SESSION['toast'] ?></div>
+    <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
 
 <style>
 .profile-container {
@@ -36,14 +40,17 @@ include "../../partials/header.php";
     padding: 30px;
     border-radius: 16px;
 }
-
 .profile-img {
     width: 140px;
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
+    transition: 0.3s;
 }
 
+.profile-img:hover {
+    transform: scale(1.05);
+}
 .info-row {
     margin-bottom: 14px;
 }
@@ -56,13 +63,37 @@ include "../../partials/header.php";
 .info-value {
     font-size: 16px;
 }
+.profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.edit-photo-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.edit-photo-btn:hover {
+    background: rgba(255,255,255,0.16);
+}
 </style>
 
 <div class="profile-container">
     <div class="profile-card">
 
-        <div>
+        <div class="profile-photo-section">
             <img src="<?= htmlspecialchars($photo) ?>" class="profile-img">
+
+            <a href="edit_profile_picture.php" class="edit-photo-btn">
+                Edit Photo
+            </a>
         </div>
 
         <div>
@@ -95,4 +126,10 @@ include "../../partials/header.php";
     </div>
 </div>
 
+<script>
+setTimeout(() => {
+    const toast = document.getElementById("toast");
+    if (toast) toast.remove();
+}, 3000);
+</script>
 <?php include "../../partials/footer.php"; ?>
