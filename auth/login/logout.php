@@ -1,6 +1,5 @@
 <?php
-session_start();
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!empty($_COOKIE['remember_me'])) {
     $parts = explode(':', $_COOKIE['remember_me']);
@@ -8,8 +7,13 @@ if (!empty($_COOKIE['remember_me'])) {
     if (count($parts) === 2) {
         $selector = $parts[0];
 
-        $stmt = $pdo->prepare("DELETE FROM remember_tokens WHERE selector = :selector");
-        $stmt->execute([':selector' => $selector]);
+        $stmt = $db->prepare("
+            DELETE FROM remember_tokens
+            WHERE selector = :selector
+        ");
+        $stmt->execute([
+            ':selector' => $selector
+        ]);
     }
 
     setcookie(
@@ -18,7 +22,7 @@ if (!empty($_COOKIE['remember_me'])) {
         [
             'expires' => time() - 3600,
             'path' => '/',
-            'secure' => isset($_SERVER['HTTPS']),
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
             'httponly' => true,
             'samesite' => 'Lax'
         ]
@@ -28,5 +32,5 @@ if (!empty($_COOKIE['remember_me'])) {
 $_SESSION = [];
 session_destroy();
 
-header("Location: /auth/login.php");
+header("Location: login.php");
 exit;

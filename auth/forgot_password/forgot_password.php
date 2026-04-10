@@ -1,6 +1,5 @@
 <?php
-session_start();
-include "../partials/header.php";
+include "../../partials/header.php";
 
 $error = $_SESSION['forgot_error'] ?? "";
 $success = $_SESSION['forgot_success'] ?? "";
@@ -11,11 +10,11 @@ unset($_SESSION['forgot_error'], $_SESSION['forgot_success']);
   <div class="auth-card">
     <h2>Forgot Password</h2>
 
-    <?php if($error): ?>
+    <?php if ($error): ?>
       <div class="error-box"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <?php if($success): ?>
+    <?php if ($success): ?>
       <div class="success-box"><?= htmlspecialchars($success) ?></div>
     <?php endif; ?>
 
@@ -29,4 +28,4 @@ unset($_SESSION['forgot_error'], $_SESSION['forgot_success']);
   </div>
 </div>
 
-<?php include "../partials/footer.php"; ?>
+<?php include "../../partials/footer.php"; ?>

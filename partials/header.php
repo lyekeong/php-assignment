@@ -33,6 +33,9 @@ require_once __DIR__ . '/remember_me.php';
             <a href="/index.php" class="icon-link" aria-label="Home">
                 <i class="fa-solid fa-house"></i>
             </a>
+            <a href="/customer/shop.php" class="icon-link" aria-label="Shop">
+                <i class="fa-solid fa-store"></i>
+            </a>
             <a href="/customer/cart.php" class="icon-link" aria-label="Cart">
                 <i class="fa-solid fa-cart-shopping"></i>
             </a>
@@ -41,30 +44,29 @@ require_once __DIR__ . '/remember_me.php';
 
     <div class="nav-right">
         <nav class="nav-icons-right">
-            <a href="/customer/shop.php" class="icon-link" aria-label="Shop">
-                <i class="fa-solid fa-store"></i>
-            </a>
+            
         </nav>
 
         <nav class="nav-auth">
             <?php if (isset($_SESSION['role'])): ?>
 
                 <?php if ($_SESSION['role'] == "customer"): ?>
-                    <a href="/customer/profile.php">Profile</a>
-                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
+                    <a href="/customer/order.php">Orders</a>
+                    <a href="/customer/profile/profile.php">Profile</a>
+                    <a href="/auth/login/logout.php" class="btn logout-btn">Logout</a>
 
                 <?php elseif ($_SESSION['role'] == "admin"): ?>
                     <a href="/admin/index.php">Admin</a>
-                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
+                    <a href="/auth/login/logout.php" class="btn logout-btn">Logout</a>
 
                 <?php elseif ($_SESSION['role'] == "staff"): ?>
                     <a href="/staff/index.php">Staff</a>
-                    <a href="/auth/logout.php" class="btn logout-btn">Logout</a>
+                    <a href="/auth/login/logout.php" class="btn logout-btn">Logout</a>
 
                 <?php endif; ?>
 
             <?php else: ?>
-                <a href="/auth/login.php" class="btn">Login</a>
+                <a href="/auth/login/login.php" class="btn">Login</a>
             <?php endif; ?>
         </nav>
     </div>

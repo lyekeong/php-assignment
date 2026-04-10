@@ -1,5 +1,5 @@
 <?php
-require '../database/db.php';
+require '../config/db.php';
 
 // 1. Inputs
 $limit = 20;
@@ -71,18 +71,18 @@ switch ($sort) {
 }
 
 // 5. Execution
-$total_products_stmt = $_db->prepare("SELECT COUNT(*) FROM products $query_where");
+$total_products_stmt = $db->prepare("SELECT COUNT(*) FROM products $query_where");
 $total_products_stmt->execute($params);
 $total_products = $total_products_stmt->fetchColumn();
 $total_pages = ceil($total_products / $limit);
 
-$stmt = $_db->prepare("SELECT * FROM products $query_where ORDER BY $order_by LIMIT $limit OFFSET $offset");
+$stmt = $db->prepare("SELECT * FROM products $query_where ORDER BY $order_by LIMIT $limit OFFSET $offset");
 $stmt->execute($params);
 $products = $stmt->fetchAll();
 
 // 6. Data for Filter UI
-$categories = $_db->query("SELECT * FROM categories")->fetchAll();
-$brands_list = $_db->query("SELECT DISTINCT brand FROM products ORDER BY brand ASC")->fetchAll(PDO::FETCH_COLUMN);
+$categories = $db->query("SELECT * FROM categories")->fetchAll();
+$brands_list = $db->query("SELECT DISTINCT brand FROM products ORDER BY brand ASC")->fetchAll(PDO::FETCH_COLUMN);
 ?>
 
 <!DOCTYPE html>

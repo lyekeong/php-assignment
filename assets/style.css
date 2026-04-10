@@ -54,12 +54,6 @@ body {
     font-size:22px;
 }
 
-/* HERO */
-.hero {
-    text-align:center;
-    padding:120px 20px;
-}
-
 .hero h1 {
     font-size:48px;
 }
@@ -132,16 +126,17 @@ body {
 /* ===== NIGHT SKY HERO ===== */
 
 .hero {
-    position:relative;
-    height:100vh;
-    overflow:hidden;
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
     background: radial-gradient(circle at bottom, #1e293b 0%, #0f172a 60%, #020617 100%);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    padding-top: 320px;
+    box-sizing: border-box;
 }
-
 /* MOON */
 .moon {
     position:absolute;
@@ -182,6 +177,7 @@ body {
     font-size:60px;
     letter-spacing:3px;
     text-shadow:0 0 20px rgba(255,255,255,0.7);
+    margin-top: 0px;
 }
 
 .hero-content p {
@@ -338,7 +334,7 @@ body {
 }
 
 .form-group {
-    margin-bottom:18px;
+    margin-bottom:1px;
     text-align:left;
 }
 

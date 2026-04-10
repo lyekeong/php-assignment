@@ -12,7 +12,7 @@
         <?php endif; ?>
         <h1>LunaSteps</h1>
         <p>Walk Under the Moonlight</p>
-        <button class="btn pulse">Shop Now</button>
+        <a href="customer/shop.php" class="btn pulse">Shop Now</a>
     </div>
 </section>
 

@@ -1,5 +1,5 @@
 <?php
-include "../partials/header.php";
+include "../../partials/header.php";
 
 $error = $_SESSION['login_error'] ?? "";
 $old_login = $_SESSION['old_login'] ?? "";
@@ -7,24 +7,26 @@ $old_login = $_SESSION['old_login'] ?? "";
 unset($_SESSION['login_error']);
 unset($_SESSION['old_login']);
 ?>
-<style>
-    .remember-row {
-        margin: 6px 0 10px 0;
-    }
 
-    .remember-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 14px;
-        cursor: pointer;
-    }
+<style>
+.remember-row {
+    margin: 6px 0 10px 0;
+}
+
+.remember-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
 </style>
+
 <div class="auth-container">
     <div class="auth-card fade-in">
         <h2>🌙 LunaSteps Login</h2>
 
-        <?php if($error): ?>
+        <?php if ($error): ?>
             <div class="error-box"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
@@ -53,24 +55,24 @@ unset($_SESSION['old_login']);
             </div>
 
             <div class="form-row remember-row">
-    <label class="remember-label">
-        <input type="checkbox" name="remember_me" value="1">
-        Remember Me
-    </label>
-</div>
+                <label class="remember-label">
+                    <input type="checkbox" name="remember_me" value="1">
+                    Remember Me
+                </label>
+            </div>
 
             <button class="btn pulse" type="submit">Login</button>
         </form>
 
         <p class="switch-text">
             Don't have account?
-            <a href="register.php">Register</a>
+            <a href="../register/register.php">Register</a>
         </p>
 
         <p class="switch-text">
-            <a href="forgot_password.php">Forgot Password?</a>
+            <a href="../forgot_password/forgot_password.php">Forgot Password?</a>
         </p>
     </div>
 </div>
 
-<?php include "../partials/footer.php"; ?>
+<?php include "../../partials/footer.php"; ?>

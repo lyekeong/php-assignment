@@ -1,6 +1,5 @@
 <?php
-session_start();
-require "../config/db.php";
+require "../../config/db.php";
 
 $token = $_POST['token'] ?? "";
 $new = $_POST['new_password'] ?? "";
@@ -14,12 +13,18 @@ if ($token === "") {
     exit();
 }
 
-/* ===== FIND USER BY TOKEN ===== */
-$stmt = $conn->prepare("SELECT user_id, password_hash FROM users WHERE reset_token=? AND reset_token_expiry > NOW()");
-$stmt->bind_param("s", $token);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+/* find user by token */
+$stmt = $db->prepare("
+    SELECT user_id, password_hash
+    FROM users
+    WHERE reset_token = :token
+      AND reset_token_expiry > NOW()
+    LIMIT 1
+");
+$stmt->execute([
+    ':token' => $token
+]);
+$user = $stmt->fetch();
 
 if (!$user) {
     $_SESSION['reset_error'] = "This reset link is invalid or expired.";
@@ -27,27 +32,27 @@ if (!$user) {
     exit();
 }
 
-/* ===== NEW PASSWORD VALIDATION ===== */
+/* new password validation */
 $newPasswordErrors = [];
 
 if (strlen($new) < 8) {
-    $newPasswordErrors[] = "at least 8 characters";
+    $newPasswordErrors[] = "At least 8 characters.";
 }
 
 if (!preg_match("/[A-Z]/", $new)) {
-    $newPasswordErrors[] = "one uppercase letter";
+    $newPasswordErrors[] = "One uppercase letter.";
 }
 
 if (!preg_match("/[a-z]/", $new)) {
-    $newPasswordErrors[] = "one lowercase letter";
+    $newPasswordErrors[] = "One lowercase letter.";
 }
 
 if (!preg_match("/[0-9]/", $new)) {
-    $newPasswordErrors[] = "one number";
+    $newPasswordErrors[] = "One number.";
 }
 
 if (preg_match('/\s/', $new)) {
-    $newPasswordErrors[] = "no spaces allowed";
+    $newPasswordErrors[] = "No spaces allowed.";
 }
 
 if (password_verify($new, $user['password_hash'])) {
@@ -68,13 +73,21 @@ if (!empty($errors)) {
     exit();
 }
 
-/* ===== UPDATE PASSWORD ===== */
+/* update password */
 $new_hash = password_hash($new, PASSWORD_DEFAULT);
 
-$stmt = $conn->prepare("UPDATE users SET password_hash=?, reset_token=NULL, reset_token_expiry=NULL WHERE user_id=?");
-$stmt->bind_param("si", $new_hash, $user['user_id']);
-$stmt->execute();
+$updateStmt = $db->prepare("
+    UPDATE users
+    SET password_hash = :password_hash,
+        reset_token = NULL,
+        reset_token_expiry = NULL
+    WHERE user_id = :user_id
+");
+$updateStmt->execute([
+    ':password_hash' => $new_hash,
+    ':user_id' => $user['user_id']
+]);
 
 $_SESSION['password_success'] = "Password updated successfully.";
-header("Location: login.php");
+header("Location: ../login/login.php");
 exit();

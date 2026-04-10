@@ -1,6 +1,6 @@
 <?php
-require "../config/db.php";
-include "../partials/header.php";
+require "../../config/db.php";
+include "../../partials/header.php";
 
 $token = $_GET['token'] ?? '';
 $error = $_SESSION['reset_error'] ?? "";
@@ -8,19 +8,25 @@ unset($_SESSION['reset_error']);
 
 if ($token === "") {
     echo "<div class='auth-container'><div class='auth-card'><div class='error-box'>Invalid reset link.</div></div></div>";
-    include "../partials/footer.php";
+    include "../../partials/footer.php";
     exit();
 }
 
-$stmt = $conn->prepare("SELECT user_id FROM users WHERE reset_token=? AND reset_token_expiry > NOW()");
-$stmt->bind_param("s", $token);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$stmt = $db->prepare("
+    SELECT user_id
+    FROM users
+    WHERE reset_token = :token
+      AND reset_token_expiry > NOW()
+    LIMIT 1
+");
+$stmt->execute([
+    ':token' => $token
+]);
+$user = $stmt->fetch();
 
 if (!$user) {
     echo "<div class='auth-container'><div class='auth-card'><div class='error-box'>This reset link is invalid or expired.</div></div></div>";
-    include "../partials/footer.php";
+    include "../../partials/footer.php";
     exit();
 }
 
@@ -51,6 +57,7 @@ if (!empty($errors['confirm_password'])) {
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
+
 <style>
   .auth-container {
     display: flex;
@@ -59,6 +66,7 @@ if (!empty($errors['confirm_password'])) {
     min-height: 80vh;
     padding: 230px;
   }
+
   .error-text {
     display: block;
     min-height: 18px;
@@ -112,91 +120,81 @@ if (!empty($errors['confirm_password'])) {
   }
 
   .auth-card input {
-    width:100%;
-    padding:12px;
-    margin-bottom:2px;
-    border:none;
-    border-radius:8px;
-    background:#0f172a;
-    color:white;
-    transition:0.3s;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 2px;
+    border: none;
+    border-radius: 8px;
+    background: #0f172a;
+    color: white;
+    transition: 0.3s;
   }
 
-  .btn{
+  .btn {
     margin-top: 8px;
   }
 
   .error-text.show {
     margin-bottom: 15px;
   }
-  
+
   h2 {
     margin-top: 0px;
   }
 
   .toast-container {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.toast {
-  min-width: 260px;
-  max-width: 360px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  color: #fff;
-  background: #e74c3c;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  font-size: 13px;
-  line-height: 1.4;
-  opacity: 0;
-  transform: translateY(-10px);
-  animation: toastIn 0.25s ease forwards;
-}
-
-.toast.hide {
-  animation: toastOut 0.25s ease forwards;
-}
-
-@keyframes toastIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-}
 
-@keyframes toastOut {
-  to {
+  .toast {
+    min-width: 260px;
+    max-width: 360px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #fff;
+    background: #e74c3c;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    font-size: 13px;
+    line-height: 1.4;
     opacity: 0;
     transform: translateY(-10px);
+    animation: toastIn 0.25s ease forwards;
   }
-}
+
+  .toast.hide {
+    animation: toastOut 0.25s ease forwards;
+  }
+
+  @keyframes toastIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toastOut {
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
 </style>
 
 <div class="auth-container">
   <div class="auth-card">
     <h2>Reset Password</h2>
 
-    <?php if($error): ?>
-      <div class="error-box"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-
-    <?php if(!empty($errors) && isset($errors['general'])): ?>
-      <div class="error-box"><?= htmlspecialchars($errors['general']) ?></div>
-    <?php endif; ?>
-
     <form action="update_password.php" method="POST" novalidate>
       <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
       <div class="form-group">
         <input type="password" name="new_password" id="new_password" placeholder="New Password" required>
-
-        
 
         <div class="password-note">Do not use spaces in your password.</div>
 
@@ -206,8 +204,6 @@ if (!empty($errors['confirm_password'])) {
         </div>
         <small class="error-text" id="newPasswordError"></small>
       </div>
-
-      
 
       <div class="form-group">
         <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm New Password" required>
@@ -271,34 +267,22 @@ if (!empty($errors['confirm_password'])) {
       const hasNumber = /[0-9]/.test(value);
 
       if (hasMinLength) {
-        $ruleLength
-          .text("✓ Minimum of 8 characters")
-          .removeClass("invalid")
-          .addClass("valid");
+        $ruleLength.text("✓ Minimum of 8 characters").removeClass("invalid").addClass("valid");
       } else {
-        $ruleLength
-          .text("✕ Minimum of 8 characters")
-          .removeClass("valid")
-          .addClass("invalid");
+        $ruleLength.text("✕ Minimum of 8 characters").removeClass("valid").addClass("invalid");
       }
 
       if (hasUpper && hasLower && hasNumber) {
-        $ruleComplex
-          .text("✓ Uppercase, lowercase letters, and one number")
-          .removeClass("invalid")
-          .addClass("valid");
+        $ruleComplex.text("✓ Uppercase, lowercase letters, and one number").removeClass("invalid").addClass("valid");
       } else {
-        $ruleComplex
-          .text("✕ Uppercase, lowercase letters, and one number")
-          .removeClass("valid")
-          .addClass("invalid");
+        $ruleComplex.text("✕ Uppercase, lowercase letters, and one number").removeClass("valid").addClass("invalid");
       }
 
       return {
         hasMinLength: hasMinLength,
         hasUpper: hasUpper,
         hasLower: hasLower,
-        hasNumber: hasNumber,
+        hasNumber: hasNumber
       };
     }
 
@@ -313,6 +297,11 @@ if (!empty($errors['confirm_password'])) {
       if (!rules.hasMinLength || !rules.hasUpper || !rules.hasLower || !rules.hasNumber) {
         return setInvalid($newPassword, $newPasswordError, "Password does not meet the requirements", showMessage);
       }
+
+      if (/\s/.test(value)) {
+        return setInvalid($newPassword, $newPasswordError, "No spaces allowed", showMessage);
+      }
+
       return setValid($newPassword, $newPasswordError);
     }
 
@@ -391,8 +380,7 @@ if (!empty($errors['confirm_password'])) {
         }, 250);
       }, 2500);
     }
-    
   });
 </script>
 
-<?php include "../partials/footer.php"; ?>
+<?php include "../../partials/footer.php"; ?>

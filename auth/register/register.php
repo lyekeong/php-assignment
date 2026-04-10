@@ -1,5 +1,5 @@
 <?php
-include "../partials/header.php";
+include "../../partials/header.php";
 
 $errors = $_SESSION['errors'] ?? [];
 $old = $_SESSION['old'] ?? [];
@@ -14,57 +14,50 @@ unset($_SESSION['old']);
 
         <form action="register_process.php" method="POST" id="registerForm" novalidate>
 
-            <!-- Username -->
             <div class="form-group">
+                <small class="error-text<?= !empty($errors['username']) ? ' show' : '' ?>" id="usernameError">
+                    <?= htmlspecialchars($errors['username'] ?? '') ?>
+                </small>
                 <input
                     type="text"
                     name="username"
                     id="username"
                     value="<?= htmlspecialchars($old['username'] ?? '') ?>"
                     placeholder="Username"
+                    class="input"
                 >
-                <small class="error-text" id="usernameError">
-                    <?= htmlspecialchars($errors['username'] ?? '') ?>
-                </small>
             </div>
 
-            <!-- Email -->
             <div class="form-group">
+                <small class="error-text<?= !empty($errors['email']) ? ' show' : '' ?>" id="emailError">
+                    <?= htmlspecialchars($errors['email'] ?? '') ?>
+                </small>
                 <input
                     type="text"
                     name="email"
                     id="email"
                     value="<?= htmlspecialchars($old['email'] ?? '') ?>"
                     placeholder="Email"
+                    class="input"
                 >
-                <small class="error-text" id="emailError">
-                    <?= htmlspecialchars($errors['email'] ?? '') ?>
-                </small>
             </div>
 
-            <!-- Phone -->
             <div class="form-group">
+                <small class="error-text<?= !empty($errors['phone']) ? ' show' : '' ?>" id="phoneError">
+                    <?= htmlspecialchars($errors['phone'] ?? '') ?>
+                </small>
                 <input
                     type="text"
                     name="phone"
                     id="phone"
                     value="<?= htmlspecialchars($old['phone'] ?? '') ?>"
                     placeholder="Phone Number"
+                    class="input"
                 >
-                <small class="error-text" id="phoneError">
-                    <?= htmlspecialchars($errors['phone'] ?? '') ?>
-                </small>
             </div>
 
-            <!-- Password -->
             <div class="form-group">
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                >
-                <small class="error-text" id="passwordError">
+                <small class="error-text<?= !empty($errors['password']) ? ' show' : '' ?>" id="passwordError">
                     <?= htmlspecialchars($errors['password'] ?? '') ?>
                 </small>
 
@@ -72,19 +65,27 @@ unset($_SESSION['old']);
                     <div class="password-rule invalid" id="ruleLength">✕ Minimum of 8 characters</div>
                     <div class="password-rule invalid" id="ruleComplex">✕ Uppercase, lowercase letters, and one number</div>
                 </div>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="Password"
+                    class="input"
+                >
             </div>
 
-            <!-- Confirm Password -->
             <div class="form-group">
+                <small class="error-text<?= !empty($errors['confirm_password']) ? ' show' : '' ?>" id="confirmPasswordError">
+                    <?= htmlspecialchars($errors['confirm_password'] ?? '') ?>
+                </small>
                 <input
                     type="password"
                     name="confirm_password"
                     id="confirm_password"
                     placeholder="Confirm Password"
+                    class="input"
                 >
-                <small class="error-text" id="confirmPasswordError">
-                    <?= htmlspecialchars($errors['confirm_password'] ?? '') ?>
-                </small>
             </div>
 
             <button class="btn pulse" type="submit">Register</button>
@@ -94,16 +95,15 @@ unset($_SESSION['old']);
 
 <style>
     .error-text {
-        display: block;
+        display: none;
         min-height: 18px;
         margin-top: 6px;
         font-size: 13px;
         color: #e74c3c;
-        visibility: hidden;
     }
 
     .error-text.show {
-        visibility: visible;
+        display: block;
     }
 
     .password-rules {
@@ -127,11 +127,19 @@ unset($_SESSION['old']);
     .input-invalid {
         border: 1px solid #e74c3c !important;
         box-shadow: none !important;
+        margin-top: 3px;
     }
 
     .input-valid {
         border: 1px solid #2ecc71 !important;
         box-shadow: none !important;
+    }
+
+    .input {
+        display: block;
+        width: 100%;
+        margin: 0;
+        margin-top: 10px;
     }
 </style>
 
@@ -220,14 +228,14 @@ $(function () {
 
     function validatePhone(showMessage = false) {
         const value = $phone.val().trim();
-        const phonePattern = /^[0-9+\-\s]{8,15}$/;
+        const phonePattern = /^[0-9]{10,11}$/;
 
         if (value === "") {
             return setInvalid($phone, $phoneError, "Phone number is required", showMessage);
         }
 
         if (!phonePattern.test(value)) {
-            return setInvalid($phone, $phoneError, "Invalid phone number", showMessage);
+            return setInvalid($phone, $phoneError, "Phone must be 10–11 digits", showMessage);
         }
 
         return setValid($phone, $phoneError);
@@ -242,27 +250,15 @@ $(function () {
         const hasNumber = /[0-9]/.test(value);
 
         if (hasMinLength) {
-            $ruleLength
-                .text("✓ Minimum of 8 characters")
-                .removeClass("invalid")
-                .addClass("valid");
+            $ruleLength.text("✓ Minimum of 8 characters").removeClass("invalid").addClass("valid");
         } else {
-            $ruleLength
-                .text("✕ Minimum of 8 characters")
-                .removeClass("valid")
-                .addClass("invalid");
+            $ruleLength.text("✕ Minimum of 8 characters").removeClass("valid").addClass("invalid");
         }
 
         if (hasUpper && hasLower && hasNumber) {
-            $ruleComplex
-                .text("✓ Uppercase, lowercase letters, and one number")
-                .removeClass("invalid")
-                .addClass("valid");
+            $ruleComplex.text("✓ Uppercase, lowercase letters, and one number").removeClass("invalid").addClass("valid");
         } else {
-            $ruleComplex
-                .text("✕ Uppercase, lowercase letters, and one number")
-                .removeClass("valid")
-                .addClass("invalid");
+            $ruleComplex.text("✕ Uppercase, lowercase letters, and one number").removeClass("valid").addClass("invalid");
         }
 
         return {
@@ -283,6 +279,10 @@ $(function () {
 
         if (!rules.hasMinLength || !rules.hasUpper || !rules.hasLower || !rules.hasNumber) {
             return setInvalid($password, $passwordError, "Password does not meet the requirements", showMessage);
+        }
+
+        if (/\s/.test(value)) {
+            return setInvalid($password, $passwordError, "No spaces allowed", showMessage);
         }
 
         return setValid($password, $passwordError);
@@ -329,51 +329,27 @@ $(function () {
     });
 
     $username.on("input", function () {
-        if (touched.username) {
-            validateUsername(true);
-        } else {
-            validateUsername(false);
-        }
+        touched.username ? validateUsername(true) : validateUsername(false);
     });
 
     $email.on("input", function () {
-        if (touched.email) {
-            validateEmail(true);
-        } else {
-            validateEmail(false);
-        }
+        touched.email ? validateEmail(true) : validateEmail(false);
     });
 
     $phone.on("input", function () {
-        if (touched.phone) {
-            validatePhone(true);
-        } else {
-            validatePhone(false);
-        }
+        touched.phone ? validatePhone(true) : validatePhone(false);
     });
 
     $password.on("input", function () {
-        if (touched.password) {
-            validatePassword(true);
-        } else {
-            validatePassword(false);
-        }
+        touched.password ? validatePassword(true) : validatePassword(false);
 
         if ($confirmPassword.val() !== "") {
-            if (touched.confirm_password) {
-                validateConfirmPassword(true);
-            } else {
-                validateConfirmPassword(false);
-            }
+            touched.confirm_password ? validateConfirmPassword(true) : validateConfirmPassword(false);
         }
     });
 
     $confirmPassword.on("input", function () {
-        if (touched.confirm_password) {
-            validateConfirmPassword(true);
-        } else {
-            validateConfirmPassword(false);
-        }
+        touched.confirm_password ? validateConfirmPassword(true) : validateConfirmPassword(false);
     });
 
     $form.on("submit", function (e) {
@@ -394,14 +370,8 @@ $(function () {
         }
     });
 
-    hideError($usernameError);
-    hideError($emailError);
-    hideError($phoneError);
-    hideError($passwordError);
-    hideError($confirmPasswordError);
-
     updatePasswordRules();
 });
 </script>
 
-<?php include "../partials/footer.php"; ?>
+<?php include "../../partials/footer.php"; ?>

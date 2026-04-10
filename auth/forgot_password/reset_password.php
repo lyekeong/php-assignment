@@ -1,9 +1,9 @@
 <?php
-session_start();
 date_default_timezone_set('Asia/Kuala_Lumpur');
-require_once "../config/db.php";
-require_once "../mailer/SMTP.php";
-require_once "../mailer/PHPMailer.php";
+
+require "../../config/db.php";
+require "../../mailer/SMTP.php";
+require "../../mailer/PHPMailer.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: forgot_password.php");
@@ -18,11 +18,16 @@ if ($email === "") {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT user_id, email FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$stmt = $db->prepare("
+    SELECT user_id, email
+    FROM users
+    WHERE email = :email
+    LIMIT 1
+");
+$stmt->execute([
+    ':email' => $email
+]);
+$user = $stmt->fetch();
 
 if (!$user) {
     $_SESSION['forgot_error'] = "No account found with that email.";
@@ -33,15 +38,19 @@ if (!$user) {
 $token = bin2hex(random_bytes(32));
 $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-$updateStmt = $conn->prepare("
+$updateStmt = $db->prepare("
     UPDATE users
-    SET reset_token = ?, reset_token_expiry = ?
-    WHERE user_id = ?
+    SET reset_token = :reset_token,
+        reset_token_expiry = :reset_token_expiry
+    WHERE user_id = :user_id
 ");
-$updateStmt->bind_param("ssi", $token, $expiry, $user['user_id']);
-$updateStmt->execute();
+$updateStmt->execute([
+    ':reset_token' => $token,
+    ':reset_token_expiry' => $expiry,
+    ':user_id' => $user['user_id']
+]);
 
-$link = "http://localhost:8000/auth/reset_form.php?token=" . urlencode($token);
+$link = "http://localhost:8000/auth/forgot_password/reset_form.php?token=" . urlencode($token);
 
 $mail = new PHPMailer();
 
